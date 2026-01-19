@@ -17,6 +17,7 @@
   <InvalidSpatialRepresentationType>Spatial representation code is not valid</InvalidSpatialRepresentationType>
   <PublicationDate>Value is required for Metadata publication date</PublicationDate>
   <CreationDate>Value is required for Metadata creation date</CreationDate>
+  <PublicationDateBeforeCreationDate>Publication Date should be after Creation Date</PublicationDateBeforeCreationDate>
   <MissingDate>Value is required for Date</MissingDate>
   <InvalidDateTypeCode>Date type is not valid</InvalidDateTypeCode>
   <BeginDate>Value is required for Begin Date</BeginDate>
@@ -41,10 +42,20 @@
   <DistributionFormatVersion>Value is required for distribution format - File version</DistributionFormatVersion>
   <DistributionFormatInvalid>Value for distribution format is not valid</DistributionFormatInvalid>
   <OnlineResourceUrl>Value is required for Online Resource URL</OnlineResourceUrl>
+  <OnlineResourceProtocol>Protocol of Online Resource is not valid. Valid values are: </OnlineResourceProtocol>
+  <TemporalExtentRequired>Temporal extent is required</TemporalExtentRequired>
+  <GeographicExtentRequired>Geographic extent is required</GeographicExtentRequired>
+  <GeographicExtentWestEast>Geographic extent - westbound longitude should be lower than eastbound longitude</GeographicExtentWestEast>
+  <GeographicExtentNorthSouth>Geographic extent - southbound latitude should be lower than northbound latitude</GeographicExtentNorthSouth>
 
   <MapResourcesREST>REST Map Resources should be available in english and french</MapResourcesREST>
   <MapResourcesRESTNumber>The number of ESRI REST Map Resources should be at most 2 (one for english and one for french)</MapResourcesRESTNumber>
   <MapResourcesWMS>WMS Map Resources should be available in english and french</MapResourcesWMS>
   <MapResourcesWMSNumber>The number of WMS Map Resources should be at most 2 (one for english and one for french)</MapResourcesWMSNumber>
+
+  <ServiceNamespace>srv:SV_ServiceIdentification is misplaced for gmd:MD_ScopeCode: </ServiceNamespace>
+  <MissingContactMail>Contact - Electronic mail address is required</MissingContactMail>
+
+  <hasDuplicatedOnlineResource>Duplicated Online Resource URLs for the same language are not allowed. The following duplicate(s) (language; URL) were identified:</hasDuplicatedOnlineResource>
 
 </strings>

@@ -17,6 +17,7 @@
   <InvalidSpatialRepresentationType>Le code de fréquence de mise à jour n'est pas valide</InvalidSpatialRepresentationType>
   <PublicationDate>Une valeur est nécessaire pour: Métadonnées date de publication</PublicationDate>
   <CreationDate>>Une valeur est nécessaire pour: Métadonnées date de création</CreationDate>
+  <PublicationDateBeforeCreationDate>La date de publication doit être postérieure à la date de création</PublicationDateBeforeCreationDate>
   <MissingDate>Une valeur est nécessaire pour la Date</MissingDate>
   <InvalidDateTypeCode>Le code de type de date n'est pas valide</InvalidDateTypeCode>
   <BeginDate>Une valeur est nécessaire pour la Date de début</BeginDate>
@@ -41,10 +42,20 @@
   <DistributionFormatVersion>Une valeur est nécessaire pour: Version du Format de distribution</DistributionFormatVersion>
   <DistributionFormatInvalid>Valeur du format de distribution n'est pas valide</DistributionFormatInvalid>
   <OnlineResourceUrl>Value is required for Online Resource URL</OnlineResourceUrl>
+  <OnlineResourceProtocol>Protocole de ressource en ligne n'est pas valide. Les valeurs valides sont </OnlineResourceProtocol>
+  <TemporalExtentRequired>Une valeur est nécessaire pour: Etendue temporelle</TemporalExtentRequired>
+  <GeographicExtentRequired>Une valeur est nécessaire pour: Étendue géographique</GeographicExtentRequired>
+  <GeographicExtentWestEast>Étendue géographique - la longitude ouest doit être inférieure à la longitude est</GeographicExtentWestEast>
+  <GeographicExtentNorthSouth>Étendue géographique - la latitude sud devrait être inférieure à la latitude nord</GeographicExtentNorthSouth>
 
   <MapResourcesREST>Les sources de la carte REST devraient être disponibles en anglais et en français</MapResourcesREST>
   <MapResourcesRESTNumber>Le nombre de sources de la carte ESRI REST devrait être au plus 2 (une pour l'anglais et une pour le français)</MapResourcesRESTNumber>
   <MapResourcesWMS>Les sources de la carte WMS devraient être disponibles en anglais et en français</MapResourcesWMS>
   <MapResourcesWMSNumber>Le nombre de sources de la carte WMS devrait être au plus 2 (une pour l'anglais et une pour le français)</MapResourcesWMSNumber>
+
+  <ServiceNamespace>srv:SV_ServiceIdentification est mal placé pour gmd:MD_ScopeCode: </ServiceNamespace>
+  <MissingContactMail>Contact - Adresse de courrier électronique obligatoire</MissingContactMail>
+
+  <hasDuplicatedOnlineResource>Les URL de ressources en ligne dupliquées pour la même langue ne sont pas autorisées. Les doublons suivants (langue ; URL) ont été identifiés :</hasDuplicatedOnlineResource>
 
 </strings>

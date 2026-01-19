@@ -35,11 +35,14 @@
 
   <OtherConstraintsNote2>Note (Other Constraints) is required in both languages</OtherConstraintsNote2>
 
+  <ResourceName>Online resource name is required in both language</ResourceName>
   <ResourceDescription>Online resource description is not valid. The format should be: ContentType;Format;Lang</ResourceDescription>
   <ResourceDescriptionContentType>Online resource description content type is not valid. Valid values are: Web Service,Service Web,Dataset,Données,API,Application,Supporting Document,Document de soutien</ResourceDescriptionContentType>
   <ResourceDescriptionFormat>Online resource description format is not valid. Valid values are:</ResourceDescriptionFormat>
   <ResourceDescriptionLanguage>Online resource description language is not valid. Should be a comma separated values of ISO-LANG-3 codes</ResourceDescriptionLanguage>
   <SecurityLevel>Security User Note is not valid. Valid values are:</SecurityLevel>
+  <SecurityNoteBothLangRequired>Value is required for Security User Note in both languages</SecurityNoteBothLangRequired>
+  <SecurityNoteMismatchedBothLang>Value mismatched for Security User Note in both languages</SecurityNoteMismatchedBothLang>
   <SecurityClassificationUserNote>Security User Note is not valid for the classification code selected. Valid values are:</SecurityClassificationUserNote>
   <SecurityClassificationUserNoteEmpty>Security User Note should be empty for the classification code selected</SecurityClassificationUserNoteEmpty>
   <OtherConstraintsNote>If you indicate 'Other Restrictions' in the 'Access Constraints' or 'Use Constraints' fields, the other constraints for accessing or using the resource should be explained here.</OtherConstraintsNote>
@@ -67,6 +70,10 @@
   <CitedResponsiblePartyDeliveryPoint>Cited Responsible Party - Delivery Point should be empty or filled in English and French</CitedResponsiblePartyDeliveryPoint>
   <DistributorDeliveryPoint>Distributor - Delivery Point should be empty or filled in English and French</DistributorDeliveryPoint>
 
+  <ContactAdministrativeArea>Contact - Province/State should be empty or filled in English and French with a valid value</ContactAdministrativeArea>
+  <CitedResponsiblePartyAdministrativeArea>Cited Responsible Party - Province/State should be empty or filled in English and French  with a valid value</CitedResponsiblePartyAdministrativeArea>
+  <DistributorAdministrativeArea>Distributor - Province/State should be empty or filled in English and French with a valid value</DistributorAdministrativeArea>
+
   <ContactPhone>Contact - Phone should be empty or filled in English and French</ContactPhone>
   <CitedResponsiblePartyPhone>Cited Responsible Party - Phone should be empty or filled in English and French</CitedResponsiblePartyPhone>
   <DistributorPhone>Distributor - Phone should be empty or filled in English and French</DistributorPhone>
@@ -78,4 +85,6 @@
   <ECThesaurusOrg>Thesaurus cited responsible party organisation is required</ECThesaurusOrg>
   <ECThesaurusRole>Thesaurus cited responsible party role is required</ECThesaurusRole>
   <ECThesaurusEmail>Thesaurus cited responsible party email is required</ECThesaurusEmail>
+
+  <ElectronicMailFormat>Electronic mail address format is invalid (for example abc@abc.com)</ElectronicMailFormat>
 </strings>

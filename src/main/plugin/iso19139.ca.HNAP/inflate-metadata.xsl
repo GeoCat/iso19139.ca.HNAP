@@ -2,6 +2,7 @@
 
 <xsl:stylesheet   xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
                   xmlns:gmd="http://www.isotc211.org/2005/gmd"
+                  xmlns:gml="http://www.opengis.net/gml/3.2"
                   xmlns:xlink='http://www.w3.org/1999/xlink'
                   xmlns:gco="http://www.isotc211.org/2005/gco"
                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -118,7 +119,7 @@
       <xsl:apply-templates select="gmd:characterSet" />
       <xsl:if test="not(gmd:characterSet)">
         <gmd:characterSet>
-          <gmd:MD_CharacterSetCode codeList="http://nap.geogratis.gc.ca/metadata/register/napMetadataRegister.xml#IC_95" codeListValue="RI_458">utf8; utf8</gmd:MD_CharacterSetCode>
+          <gmd:MD_CharacterSetCode codeList="https://schemas.metadata.geo.ca/register/napMetadataRegister.xml#IC_95" codeListValue="RI_458">utf8; utf8</gmd:MD_CharacterSetCode>
         </gmd:characterSet>
       </xsl:if>
 
@@ -126,7 +127,7 @@
       <xsl:apply-templates select="gmd:hierarchyLevel" />
       <xsl:if test="not(gmd:hierarchyLevel)">
         <gmd:hierarchyLevel>
-          <gmd:MD_ScopeCode codeList="http://nap.geogratis.gc.ca/metadata/register/napMetadataRegister.xml#IC_108" codeListValue="RI_622">dataset; jeuDonnées</gmd:MD_ScopeCode>
+          <gmd:MD_ScopeCode codeList="https://schemas.metadata.geo.ca/register/napMetadataRegister.xml#IC_108" codeListValue="RI_622">dataset; jeuDonnées</gmd:MD_ScopeCode>
         </gmd:hierarchyLevel>
       </xsl:if>
 
@@ -172,7 +173,7 @@
         <gmd:locale>
           <gmd:PT_Locale id="{$mainLanguageId}">
             <gmd:languageCode>
-              <gmd:LanguageCode codeList="http://nap.geogratis.gc.ca/metadata/register/napMetadataRegister.xml#IC_116"
+              <gmd:LanguageCode codeList="https://schemas.metadata.geo.ca/register/napMetadataRegister.xml#IC_116"
                                 codeListValue="{$mainLanguage}">
                 <xsl:choose>
                   <xsl:when test="normalize-space($mainLanguage) = 'fra'">French; Français</xsl:when>
@@ -186,11 +187,11 @@
                 <gmd:country>
                   <xsl:choose>
                     <xsl:when test="upper-case($mainLanguageCountryId) = 'CAN'">
-                      <gmd:Country codeList="http://nap.geogratis.gc.ca/metadata/register/napMetadataRegister.xml#IC_117"
+                      <gmd:Country codeList="https://schemas.metadata.geo.ca/register/napMetadataRegister.xml#IC_117"
                                    codeListValue="CAN">Canada; Canada</gmd:Country>
                     </xsl:when>
                     <xsl:otherwise>
-                      <gmd:Country codeList="http://nap.geogratis.gc.ca/metadata/register/napMetadataRegister.xml#IC_117"
+                      <gmd:Country codeList="https://schemas.metadata.geo.ca/register/napMetadataRegister.xml#IC_117"
                                    codeListValue="$mainLanguageCountryId"></gmd:Country>
                     </xsl:otherwise>
                   </xsl:choose>
@@ -198,7 +199,7 @@
               </xsl:when>
             </xsl:choose>
             <gmd:characterEncoding>
-              <gmd:MD_CharacterSetCode codeList="http://nap.geogratis.gc.ca/metadata/register/napMetadataRegister.xml#IC_95"
+              <gmd:MD_CharacterSetCode codeList="https://schemas.metadata.geo.ca/register/napMetadataRegister.xml#IC_95"
                                        codeListValue="RI_458">utf8; utf8</gmd:MD_CharacterSetCode>
             </gmd:characterEncoding>
           </gmd:PT_Locale>
@@ -264,7 +265,7 @@
                       <gco:Date></gco:Date>
                     </gmd:date>
                     <gmd:dateType>
-                      <gmd:CI_DateTypeCode codeList="http://nap.geogratis.gc.ca/metadata/register/napMetadataRegister.xml#IC_87"
+                      <gmd:CI_DateTypeCode codeList="https://schemas.metadata.geo.ca/register/napMetadataRegister.xml#IC_87"
                                            codeListValue="RI_366">creation; création</gmd:CI_DateTypeCode>
                     </gmd:dateType>
                   </gmd:CI_Date>
@@ -278,7 +279,7 @@
                       <gco:Date></gco:Date>
                     </gmd:date>
                     <gmd:dateType>
-                      <gmd:CI_DateTypeCode codeList="http://nap.geogratis.gc.ca/metadata/register/napMetadataRegister.xml#IC_87"
+                      <gmd:CI_DateTypeCode codeList="https://schemas.metadata.geo.ca/register/napMetadataRegister.xml#IC_87"
                                            codeListValue="RI_367">publication; publication</gmd:CI_DateTypeCode>
                     </gmd:dateType>
                   </gmd:CI_Date>
@@ -307,7 +308,7 @@
       <xsl:apply-templates select="gmd:status" />
       <xsl:if test="not(gmd:status)">
         <gmd:status>
-          <gmd:MD_ProgressCode codeList="http://nap.geogratis.gc.ca/metadata/register/napMetadataRegister.xml#IC_106" codeListValue=""/>
+          <gmd:MD_ProgressCode codeList="https://schemas.metadata.geo.ca/register/napMetadataRegister.xml#IC_106" codeListValue=""/>
         </gmd:status>
       </xsl:if>
 
@@ -317,7 +318,7 @@
         <gmd:resourceMaintenance>
           <gmd:MD_MaintenanceInformation>
             <gmd:maintenanceAndUpdateFrequency>
-              <gmd:MD_MaintenanceFrequencyCode codeList="http://nap.geogratis.gc.ca/metadata/register/napMetadataRegister.xml#IC_102" codeListValue=""/>
+              <gmd:MD_MaintenanceFrequencyCode codeList="https://schemas.metadata.geo.ca/register/napMetadataRegister.xml#IC_102" codeListValue=""/>
             </gmd:maintenanceAndUpdateFrequency>
           </gmd:MD_MaintenanceInformation>
         </gmd:resourceMaintenance>
@@ -354,10 +355,10 @@
               </gmd:PT_FreeText>
             </gmd:useLimitation>
             <gmd:accessConstraints>
-              <gmd:MD_RestrictionCode codeList="http://nap.geogratis.gc.ca/metadata/register/napMetadataRegister.xml#IC_107" codeListValue="RI_606">license; licence</gmd:MD_RestrictionCode>
+              <gmd:MD_RestrictionCode codeList="https://schemas.metadata.geo.ca/register/napMetadataRegister.xml#IC_107" codeListValue="RI_606">license; licence</gmd:MD_RestrictionCode>
             </gmd:accessConstraints>
             <gmd:useConstraints>
-              <gmd:MD_RestrictionCode codeList="http://nap.geogratis.gc.ca/metadata/register/napMetadataRegister.xml#IC_107" codeListValue="RI_606">license; licence</gmd:MD_RestrictionCode>
+              <gmd:MD_RestrictionCode codeList="https://schemas.metadata.geo.ca/register/napMetadataRegister.xml#IC_107" codeListValue="RI_606">license; licence</gmd:MD_RestrictionCode>
             </gmd:useConstraints>
             <gmd:otherConstraints xsi:type="gmd:PT_FreeText_PropertyType">
               <gco:CharacterString/>
@@ -373,11 +374,6 @@
 
       <xsl:apply-templates select="gmd:aggregationInfo" />
       <xsl:apply-templates select="gmd:spatialRepresentationType" />
-      <xsl:if test="not(gmd:spatialRepresentationType)">
-        <gmd:spatialRepresentationType>
-          <gmd:MD_SpatialRepresentationTypeCode codeListValue="" codeList="http://nap.geogratis.gc.ca/metadata/register/napMetadataRegister.xml#IC_109"/>
-        </gmd:spatialRepresentationType>
-      </xsl:if>
 
       <xsl:apply-templates select="gmd:spatialResolution" />
       <xsl:apply-templates select="gmd:language" />
@@ -391,6 +387,50 @@
 
       <xsl:apply-templates select="gmd:environmentDescription" />
       <xsl:apply-templates select="gmd:extent" />
+
+      <!-- Add mandatory temporal extent if gmd:spatialRepresentationType exists -->
+      <xsl:if test="(gmd:spatialRepresentationType) and (count(gmd:extent/gmd:EX_Extent/gmd:temporalElement[gmd:EX_TemporalExtent/gmd:extent/gml:TimePeriod]) = 0)">
+        <gmd:extent>
+          <gmd:EX_Extent>
+            <gmd:temporalElement>
+              <gmd:EX_TemporalExtent>
+                <gmd:extent>
+                  <gml:TimePeriod gml:id="{generate-id(.)}">
+                    <gml:beginPosition></gml:beginPosition>
+                    <gml:endPosition></gml:endPosition>
+                  </gml:TimePeriod>
+                </gmd:extent>
+              </gmd:EX_TemporalExtent>
+            </gmd:temporalElement>
+          </gmd:EX_Extent>
+        </gmd:extent>
+      </xsl:if>
+
+      <!-- Add mandatory geographic extent if gmd:spatialRepresentationType exists -->
+      <xsl:if test="(gmd:spatialRepresentationType) and (count(gmd:extent/gmd:EX_Extent/gmd:geographicElement[gmd:EX_GeographicBoundingBox]) = 0)">
+        <gmd:extent>
+          <gmd:EX_Extent>
+            <gmd:geographicElement>
+              <gmd:EX_GeographicBoundingBox>
+                <gmd:westBoundLongitude>
+                  <gco:Decimal></gco:Decimal>
+                </gmd:westBoundLongitude>
+                <gmd:eastBoundLongitude>
+                  <gco:Decimal></gco:Decimal>
+                </gmd:eastBoundLongitude>
+                <gmd:southBoundLatitude>
+                  <gco:Decimal></gco:Decimal>
+                </gmd:southBoundLatitude>
+                <gmd:northBoundLatitude>
+                  <gco:Decimal></gco:Decimal>
+                </gmd:northBoundLatitude>
+              </gmd:EX_GeographicBoundingBox>
+            </gmd:geographicElement>
+          </gmd:EX_Extent>
+        </gmd:extent>
+
+      </xsl:if>
+
       <xsl:apply-templates select="gmd:supplementalInformation" />
     </xsl:copy>
   </xsl:template>

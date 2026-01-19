@@ -195,7 +195,7 @@
 
 			<!-- fixed to uft8 -->
 			<gmd:characterSet>
-				<gmd:MD_CharacterSetCode codeList="http://nap.geogratis.gc.ca/metadata/register/napMetadataRegister.xml#IC_95" codeListValue="RI_458">utf8; utf8</gmd:MD_CharacterSetCode>
+				<gmd:MD_CharacterSetCode codeList="https://schemas.metadata.geo.ca/register/napMetadataRegister.xml#IC_95" codeListValue="RI_458">utf8; utf8</gmd:MD_CharacterSetCode>
 			</gmd:characterSet>
 
 			<xsl:choose>
@@ -222,7 +222,7 @@
 
       <!-- Copy existing locales and create an extra one for the default metadata language. -->
       <xsl:apply-templates select="gmd:locale[*/gmd:languageCode/*/@codeListValue != $mainLanguage]"/>
-       
+
  		  <xsl:apply-templates select="node()[name()!='gmd:fileIdentifier' and
                                             name()!='gmd:language' and
                                             name()!='gmd:parentIdentifier' and
@@ -553,7 +553,7 @@
   <xsl:template match="gmd:Country[@codeListValue='CAN']" priority="2200">
   	<xsl:copy>
   	  <xsl:apply-templates select="@*"/>
-  	  <xsl:attribute name="codeList">http://nap.geogratis.gc.ca/metadata/register/napMetadataRegister.xml#IC_117</xsl:attribute>
+  	  <xsl:attribute name="codeList">https://schemas.metadata.geo.ca/register/napMetadataRegister.xml#IC_117</xsl:attribute>
   	  <xsl:text>Canada; Canada</xsl:text>
   	</xsl:copy>
   </xsl:template>
@@ -661,7 +661,7 @@
         <xsl:choose>
           <xsl:when test="normalize-space($codelistCode) != ''">
             <xsl:value-of
-              select="concat('http://nap.geogratis.gc.ca/metadata/register/napMetadataRegister.xml#',$codelistCode)"/>
+              select="concat('https://schemas.metadata.geo.ca/register/napMetadataRegister.xml#',$codelistCode)"/>
           </xsl:when>
           <xsl:otherwise>
             <xsl:value-of
@@ -744,7 +744,7 @@
           <xsl:copy-of select="@*" />
 
           <gmd:languageCode>
-            <gmd:LanguageCode codeList="http://nap.geogratis.gc.ca/metadata/register/napMetadataRegister.xml#IC_116">
+            <gmd:LanguageCode codeList="https://schemas.metadata.geo.ca/register/napMetadataRegister.xml#IC_116">
               <xsl:attribute name="codeListValue">
                 <xsl:value-of select="$id"/>
               </xsl:attribute>
@@ -765,7 +765,7 @@
 					</xsl:attribute>
 
           <gmd:languageCode>
-            <gmd:LanguageCode codeList="http://nap.geogratis.gc.ca/metadata/register/napMetadataRegister.xml#IC_116">
+            <gmd:LanguageCode codeList="https://schemas.metadata.geo.ca/register/napMetadataRegister.xml#IC_116">
               <xsl:attribute name="codeListValue">
                 <xsl:value-of select="$id"/>
               </xsl:attribute>
@@ -781,17 +781,6 @@
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
-
-	<!-- Replace gmx:Anchor element by a simple gco:CharacterString.
-		gmx:Anchor is usually used for linking element using xlink.
-		TODO : Currently gmx:Anchor is not supported
-	-->
-	<xsl:template match="gmx:Anchor">
-		<gco:CharacterString>
-			<xsl:value-of select="."/>
-		</gco:CharacterString>
-	</xsl:template>
-
 
   <xsl:template match="gmd:MD_DataIdentification">
     <xsl:copy>
@@ -887,9 +876,18 @@
 
 
             <gmd:type>
-              <gmd:MD_KeywordTypeCode codeList="http://nap.geogratis.gc.ca/metadata/register/napMetadataRegister.xml#IC_101" codeListValue="{@type}">
-                  <xsl:value-of select="$codelistDocument/codelists/codelist[@name='gmd:MD_KeywordTypeCode']/entry[code = $currentCodeValue]/value"/>
-              </gmd:MD_KeywordTypeCode>
+              <xsl:choose>
+                <xsl:when test="$currentCodeValue='theme'">
+                  <gmd:MD_KeywordTypeCode codeList="https://schemas.metadata.geo.ca/register/napMetadataRegister.xml#IC_101" codeListValue="RI_528">
+                    <xsl:value-of select="$codelistDocument/codelists/codelist[@name='gmd:MD_KeywordTypeCode']/entry[code = 'RI_528']/value"/>
+                  </gmd:MD_KeywordTypeCode>
+                </xsl:when>
+                <xsl:otherwise>
+                  <gmd:MD_KeywordTypeCode codeList="https://schemas.metadata.geo.ca/register/napMetadataRegister.xml#IC_101" codeListValue="{@type}">
+                    <xsl:value-of select="$codelistDocument/codelists/codelist[@name='gmd:MD_KeywordTypeCode']/entry[code = $currentCodeValue]/value"/>
+                  </gmd:MD_KeywordTypeCode>
+                </xsl:otherwise>
+              </xsl:choose>
             </gmd:type>
 
             <xsl:copy-of select="keyword[1]/gmd:thesaurusName" />
@@ -965,6 +963,11 @@
       </xsl:if>
     </xsl:copy>
   </xsl:template>
+
+
+  <!-- Remove empty extent sections -->
+  <xsl:template match="gmd:MD_DataIdentification/gmd:extent[count(gmd:EX_Extent/*) = 0]" />
+
 
   <xsl:template match="@xsi:schemaLocation">
     <xsl:if test="XslUtil:getSettingValue('system/metadata/validation/removeSchemaLocation') = 'false'">

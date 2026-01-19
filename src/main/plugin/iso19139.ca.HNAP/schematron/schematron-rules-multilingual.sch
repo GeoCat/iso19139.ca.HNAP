@@ -164,6 +164,7 @@
     />
   </xsl:function>
 
+
   <!-- =============================================================
   EC schematron rules for multilingual validation in metadata editor:
   ============================================================= -->
@@ -294,12 +295,26 @@
       <sch:let name="countryName" value="lower-case(gco:CharacterString)" />
       <sch:let name="countryNameOtherLang" value="lower-case(gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString[@locale=concat('#', $altLanguageId)])" />
 
-      <sch:assert test="(not($countryName) or
-          ($countryName and (string($country-values//rdf:Description[lower-case(normalize-space(ns2:prefLabel[@xml:lang=$mainLanguage2char])) = $countryName]))))
+      <sch:assert test="((not($countryName) and not($countryNameOtherLang)) or
+          (string($country-values//rdf:Description[lower-case(normalize-space(ns2:prefLabel[@xml:lang=$mainLanguage2char])) = $countryName])
           and
-          (not($countryNameOtherLang) or
-          string($country-values//rdf:Description[lower-case(normalize-space(ns2:prefLabel[@xml:lang=$altLanguage2char])) = $countryNameOtherLang]))"
-          >$loc/strings/ECCountry</sch:assert>
+          string($country-values//rdf:Description[lower-case(normalize-space(ns2:prefLabel[@xml:lang=$altLanguage2char])) = $countryNameOtherLang])))"
+      >$loc/strings/ECCountry</sch:assert>
+
+    </sch:rule>
+
+    <!-- Contact - Administrative area -->
+    <sch:rule context="//gmd:contact//gmd:administrativeArea">
+      <sch:let name="province-values" value="document(concat('file:///', replace(concat($thesaurusDir, '/external/thesauri/theme/GC_State_Province.rdf'), '\\', '/')))"/>
+
+      <sch:let name="administrativeArea" value="lower-case(gco:CharacterString)" />
+      <sch:let name="administrativeAreaOtherLang" value="lower-case(gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString[@locale=concat('#', $altLanguageId)])" />
+
+      <sch:assert test="((not($administrativeArea) and not($administrativeAreaOtherLang)) or
+          (string($province-values//rdf:Description[lower-case(normalize-space(ns2:prefLabel[@xml:lang=$mainLanguage2char])) = $administrativeArea])
+          and
+          string($province-values//rdf:Description[lower-case(normalize-space(ns2:prefLabel[@xml:lang=$altLanguage2char])) = $administrativeAreaOtherLang])))"
+      >$loc/strings/ContactAdministrativeArea</sch:assert>
 
     </sch:rule>
 
@@ -334,17 +349,23 @@
 
     <!-- Contact - Electronic Mail -->
     <sch:rule context="//gmd:contact/*/gmd:contactInfo/*/gmd:address/gmd:CI_Address/gmd:electronicMailAddress">
+      <sch:let name="emailAddress" value="string(gco:CharacterString)" />
+      <sch:let name="emailAddressOtherLang" value="string(gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString[@locale=concat('#', $altLanguageId)])" />
 
-      <sch:let name="missing" value="not(string(gco:CharacterString))
+      <sch:let name="missing" value="not($emailAddress)
                 or (@gco:nilReason)" />
 
-      <sch:let name="missingOtherLang" value="not(string(gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString[@locale=concat('#', $altLanguageId)]))" />
+      <sch:let name="missingOtherLang" value="not($emailAddressOtherLang)" />
+
+      <sch:let name="isEmailAddressFormat" value="XslUtilHnap:isEmailFormat($emailAddress, true())"/>
+      <sch:let name="isOtherLangEmailAddressFormat" value="XslUtilHnap:isEmailFormat($emailAddressOtherLang, true())"/>
 
       <sch:assert
         test="not($missing) and not($missingOtherLang)"
 
       >$loc/strings/ContactElectronicMail</sch:assert>
 
+      <sch:assert test="string($isEmailAddressFormat) ='true' and string($isOtherLangEmailAddressFormat) ='true'">$loc/strings/ElectronicMailFormat</sch:assert>
     </sch:rule>
 
 
@@ -480,14 +501,29 @@
       <sch:let name="countryName" value="lower-case(gco:CharacterString)" />
       <sch:let name="countryNameOtherLang" value="lower-case(gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString[@locale=concat('#', $altLanguageId)])" />
 
-      <sch:assert test="(not($countryName) or
-          ($countryName and (string($country-values//rdf:Description[lower-case(normalize-space(ns2:prefLabel[@xml:lang=$mainLanguage2char])) = $countryName]))))
+      <sch:assert test="((not($countryName) and not($countryNameOtherLang)) or
+          (string($country-values//rdf:Description[lower-case(normalize-space(ns2:prefLabel[@xml:lang=$mainLanguage2char])) = $countryName])
           and
-          (not($countryNameOtherLang) or
-          string($country-values//rdf:Description[lower-case(normalize-space(ns2:prefLabel[@xml:lang=$altLanguage2char])) = $countryNameOtherLang]))"
-          >$loc/strings/ECCountry</sch:assert>
+          string($country-values//rdf:Description[lower-case(normalize-space(ns2:prefLabel[@xml:lang=$altLanguage2char])) = $countryNameOtherLang])))"
+      >$loc/strings/ECCountry</sch:assert>
     </sch:rule>
 
+    <!-- Cited responsible party - Administrative area -->
+    <sch:rule context="//gmd:identificationInfo/*/gmd:citation/*/gmd:citedResponsibleParty//gmd:administrativeArea
+             |//*[@gco:isoType='gmd:MD_DataIdentification']/gmd:citation/*/gmd:citedResponsibleParty//gmd:administrativeArea
+             |//*[@gco:isoType='srv:SV_ServiceIdentification']/gmd:citation/*/gmd:citedResponsibleParty//gmd:administrativeArea">
+      <sch:let name="province-values" value="document(concat('file:///', replace(concat($thesaurusDir, '/external/thesauri/theme/GC_State_Province.rdf'), '\\', '/')))"/>
+
+      <sch:let name="administrativeArea" value="lower-case(gco:CharacterString)" />
+      <sch:let name="administrativeAreaOtherLang" value="lower-case(gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString[@locale=concat('#', $altLanguageId)])" />
+
+      <sch:assert test="((not($administrativeArea) and not($administrativeAreaOtherLang)) or
+          (string($province-values//rdf:Description[lower-case(normalize-space(ns2:prefLabel[@xml:lang=$mainLanguage2char])) = $administrativeArea])
+          and
+          string($province-values//rdf:Description[lower-case(normalize-space(ns2:prefLabel[@xml:lang=$altLanguage2char])) = $administrativeAreaOtherLang])))"
+      >$loc/strings/CitedResponsiblePartyAdministrativeArea</sch:assert>
+
+    </sch:rule>
 
     <!-- Cited Responsible Party - Position name -->
     <sch:rule context="//gmd:identificationInfo/*/gmd:citation/*/gmd:citedResponsibleParty/*/gmd:positionName
@@ -541,16 +577,23 @@
     <sch:rule context="//gmd:identificationInfo/*/gmd:citation/*/gmd:citedResponsibleParty/*/gmd:contactInfo/*/gmd:address/gmd:CI_Address/gmd:electronicMailAddress
                       |//*[@gco:isoType='gmd:MD_DataIdentification']/gmd:citation/*/gmd:citedResponsibleParty/*/gmd:contactInfo/*/gmd:address/gmd:CI_Address/gmd:electronicMailAddress
                       |//*[@gco:isoType='srv:SV_ServiceIdentification']/gmd:citation/*/gmd:citedResponsibleParty/*/gmd:contactInfo/*/gmd:address/gmd:CI_Address/gmd:electronicMailAddress">
+      <sch:let name="emailAddress" value="string(gco:CharacterString)" />
+      <sch:let name="emailAddressOtherLang" value="string(gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString[@locale=concat('#', $altLanguageId)])" />
 
-      <sch:let name="missing" value="not(string(gco:CharacterString))
+      <sch:let name="missing" value="not($emailAddress)
                 or (@gco:nilReason)" />
 
-      <sch:let name="missingOtherLang" value="not(string(gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString[@locale=concat('#', $altLanguageId)]))" />
+      <sch:let name="missingOtherLang" value="not($emailAddressOtherLang)" />
+
+      <sch:let name="isEmailAddressFormat" value="XslUtilHnap:isEmailFormat($emailAddress, true())"/>
+      <sch:let name="isOtherLangEmailAddressFormat" value="XslUtilHnap:isEmailFormat($emailAddressOtherLang, true())"/>
 
       <sch:assert
         test="not($missing) and not($missingOtherLang)"
 
       >$loc/strings/CitedResponsiblePartyElectronicMail</sch:assert>
+
+      <sch:assert test="string($isEmailAddressFormat) ='true' and string($isOtherLangEmailAddressFormat) ='true'">$loc/strings/ElectronicMailFormat</sch:assert>
 
     </sch:rule>
 
@@ -644,14 +687,22 @@
 
       <sch:let name="emailPresent" value="count(gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:citedResponsibleParty/gmd:CI_ResponsibleParty/gmd:contactInfo/gmd:CI_Contact/gmd:address/gmd:CI_Address/gmd:electronicMailAddress) > 0" />
 
-      <sch:let name="missingEmail" value="not(string(gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:citedResponsibleParty/gmd:CI_ResponsibleParty/gmd:contactInfo/gmd:CI_Contact/gmd:address/gmd:CI_Address/gmd:electronicMailAddress/gco:CharacterString))
+      <sch:let name="emailAddress" value="string(gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:citedResponsibleParty/gmd:CI_ResponsibleParty/gmd:contactInfo/gmd:CI_Contact/gmd:address/gmd:CI_Address/gmd:electronicMailAddress/gco:CharacterString)" />
+      <sch:let name="emailAddressOtherLang" value="string(gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:citedResponsibleParty/gmd:CI_ResponsibleParty/gmd:contactInfo/gmd:CI_Contact/gmd:address/gmd:CI_Address/gmd:electronicMailAddress/gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString[@locale=concat('#', $altLanguageId)])" />
+
+      <sch:let name="missingEmail" value="not($emailAddress)
               or (@gco:nilReason)" />
 
-      <sch:let name="missingEmailOtherLang" value="not(string(gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:citedResponsibleParty/gmd:CI_ResponsibleParty/gmd:contactInfo/gmd:CI_Contact/gmd:address/gmd:CI_Address/gmd:electronicMailAddress/gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString[@locale=concat('#', $altLanguageId)]))" />
+      <sch:let name="missingEmailOtherLang" value="not($emailAddressOtherLang)" />
+
+      <sch:let name="isEmailAddressFormat" value="XslUtilHnap:isEmailFormat($emailAddress, true())"/>
+      <sch:let name="isOtherLangEmailAddressFormat" value="XslUtilHnap:isEmailFormat($emailAddressOtherLang, true())"/>
 
       <sch:assert
         test="not($thesaurusNamePresent) or ($thesaurusNamePresent and (not($emailPresent) or ($emailPresent and not($missingEmail) and not($missingEmailOtherLang))))"
       >$loc/strings/ECThesaurusEmail</sch:assert>
+
+      <sch:assert test="string($isEmailAddressFormat) ='true' and string($isOtherLangEmailAddressFormat) ='true'">$loc/strings/ElectronicMailFormat</sch:assert>
     </sch:rule>
 
     <!-- Supplemental information -->
@@ -715,21 +766,29 @@
 
       <sch:let name="locMsg" value="geonet:appendLocaleMessage($loc/strings/SecurityLevel, $securityLevelList)" />
 
-      <sch:let name="validSecurityLevel" value="($missingTitle and $missingTitleOtherLang) or
+      <sch:let name="missingOneTitleExclusively" value="($missingTitle and not($missingTitleOtherLang)) or (not($missingTitle) and $missingTitleOtherLang)" />
+      <sch:let name="missingBothTitle" value="($missingTitle and $missingTitleOtherLang)" />
+
+      <sch:let name="validSecurityLevel" value="($missingBothTitle) or
                         ($security-level-list//rdf:Description/ns2:prefLabel[@xml:lang=$mainLanguage2char]=$securityLevel and
                          $security-level-list//rdf:Description/ns2:prefLabel[@xml:lang=$altLanguage2char]=$securityLevelTranslated)"/>
 
-      <sch:assert test="$validSecurityLevel">$locMsg</sch:assert>
+      <sch:assert test="not($missingOneTitleExclusively)">$loc/strings/SecurityNoteBothLangRequired</sch:assert>
+
+      <sch:assert test="$missingOneTitleExclusively or $validSecurityLevel">$locMsg</sch:assert>
 
       <sch:let name="securityLevelCode" value="replace($security-level-list//rdf:Description[lower-case(ns2:prefLabel[@xml:lang=$mainLanguage2char])=lower-case($securityLevel)]/@rdf:about, 'http://geonetwork-opensource.org/GC/GC_Security_Classification#', '')"/>
+      <sch:let name="securityLevelCodeTranslated" value="replace($security-level-list//rdf:Description[lower-case(ns2:prefLabel[@xml:lang=$altLanguage2char])=lower-case($securityLevelTranslated)]/@rdf:about, 'http://geonetwork-opensource.org/GC/GC_Security_Classification#', '')"/>
+      <sch:let name="securityLevelCodeMismatched" value="$securityLevelCode != $securityLevelCodeTranslated"/>
 
       <sch:let name="checkUserNoteSecurityClassificationCode" value="geonet:checkUserNoteSecurityClassificationCode($securityLevelCode, ../gmd:classification/gmd:MD_ClassificationCode)" />
 
       <sch:let name="locSecurityClassificationUserNoteMsg" value="geonet:appendLocaleMessage($loc/strings/SecurityClassificationUserNote, $checkUserNoteSecurityClassificationCode)" />
 
-      <sch:assert test="($missingTitle and $missingTitleOtherLang) or not($validSecurityLevel) or $checkUserNoteSecurityClassificationCode='NULL' or $checkUserNoteSecurityClassificationCode = ''">$locSecurityClassificationUserNoteMsg</sch:assert>
+      <sch:assert test="not($validSecurityLevel) or not($securityLevelCodeMismatched)">$loc/strings/SecurityNoteMismatchedBothLang</sch:assert>
+      <sch:assert test="($missingBothTitle) or not($validSecurityLevel) or not($securityLevelCodeMismatched) or $checkUserNoteSecurityClassificationCode='NULL' or $checkUserNoteSecurityClassificationCode = ''">$locSecurityClassificationUserNoteMsg</sch:assert>
 
-      <sch:assert test="($missingTitle and $missingTitleOtherLang) or not($validSecurityLevel) or $checkUserNoteSecurityClassificationCode!='NULL' or $checkUserNoteSecurityClassificationCode = ''">$loc/strings/SecurityClassificationUserNoteEmpty</sch:assert>
+      <sch:assert test="($missingBothTitle) or not($validSecurityLevel) or not($securityLevelCodeMismatched) or $checkUserNoteSecurityClassificationCode!='NULL' or $checkUserNoteSecurityClassificationCode = ''">$loc/strings/SecurityClassificationUserNoteEmpty</sch:assert>
 
     </sch:rule>
 
@@ -762,6 +821,16 @@
         test="not($missingLanguageForMapService)"
       >$loc/strings/MapServicesLanguage</sch:assert>
 
+      <!-- Resource name -->
+      <sch:let name="missingResourceName" value="not(string(gmd:CI_OnlineResource/gmd:name/gco:CharacterString))" />
+
+      <sch:let name="missingResourceNameOtherLang" value="not(string(gmd:CI_OnlineResource/gmd:name/gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString[@locale=concat('#', $altLanguageId)]))" />
+
+      <sch:let name="locMsgResourceName" value="geonet:prependLocaleMessage($loc/strings/ResourceName, concat(gmd:CI_OnlineResource/gmd:linkage/gmd:URL, ' : '))" />
+
+      <sch:assert
+        test="not($missingResourceName) and not($missingResourceNameOtherLang)"
+      >$locMsgResourceName</sch:assert>
 
       <!-- ResourceDescription -->
       <sch:let name="smallcase" value="'abcdefghijklmnopqrstuvwxyz'" />
@@ -798,8 +867,8 @@
       <sch:let name="resourceFormatsList" value="geonet:resourceFormatsList($thesaurusDir)" />
       <sch:let name="locMsg" value="geonet:prependLocaleMessage(geonet:appendLocaleMessage($loc/strings/ResourceDescriptionFormat, $resourceFormatsList), concat(gmd:CI_OnlineResource/gmd:linkage/gmd:URL, ' : '))" />
 
-      <sch:assert test="$formats-list//rdf:Description/ns2:prefLabel[@xml:lang = normalize-space($mainLanguage2char)]/text() = $format and
-                          $formats-list//rdf:Description/ns2:prefLabel[@xml:lang = normalize-space($altLanguage2char)]/text() = $formatTranslated">$locMsg</sch:assert>
+      <sch:assert test="string($formats-list//rdf:Description[@rdf:about = concat('http://geonetwork-opensource.org/EC/resourceformat#', $format)]) and
+                          string($formats-list//rdf:Description[@rdf:about = concat('http://geonetwork-opensource.org/EC/resourceformat#',$formatTranslated)])">$locMsg</sch:assert>
 
       <sch:let name="locMsgLang" value="geonet:prependLocaleMessage($loc/strings/ResourceDescriptionLanguage, concat(gmd:CI_OnlineResource/gmd:linkage/gmd:URL, ' : '))" />
 
@@ -874,6 +943,21 @@
 
     </sch:rule>
 
+    <!-- Distributor contact - Administrative area -->
+    <sch:rule context="//gmd:distributionInfo/*/gmd:distributor/gmd:MD_Distributor/gmd:distributorContact//gmd:administrativeArea">
+      <sch:let name="province-values" value="document(concat('file:///', replace(concat($thesaurusDir, '/external/thesauri/theme/GC_State_Province.rdf'), '\\', '/')))"/>
+
+      <sch:let name="administrativeArea" value="lower-case(gco:CharacterString)" />
+      <sch:let name="administrativeAreaOtherLang" value="lower-case(gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString[@locale=concat('#', $altLanguageId)])" />
+
+      <sch:assert test="((not($administrativeArea) and not($administrativeAreaOtherLang)) or
+          (string($province-values//rdf:Description[lower-case(normalize-space(ns2:prefLabel[@xml:lang=$mainLanguage2char])) = $administrativeArea])
+          and
+          string($province-values//rdf:Description[lower-case(normalize-space(ns2:prefLabel[@xml:lang=$altLanguage2char])) = $administrativeAreaOtherLang])))"
+      >$loc/strings/DistributorAdministrativeArea</sch:assert>
+
+    </sch:rule>
+
     <!-- Distributor contact - Country -->
     <sch:rule context="//gmd:distributionInfo/*/gmd:distributor/gmd:MD_Distributor/gmd:distributorContact//gmd:country">
       <sch:let name="country-values" value="document(concat('file:///', replace(concat($thesaurusDir, '/external/thesauri/theme/ISO_Countries.rdf'), '\\', '/')))"/>
@@ -881,12 +965,11 @@
       <sch:let name="countryName" value="lower-case(gco:CharacterString)" />
       <sch:let name="countryNameOtherLang" value="lower-case(gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString[@locale=concat('#', $altLanguageId)])" />
 
-      <sch:assert test="(not($countryName) or
-          ($countryName and (string($country-values//rdf:Description[lower-case(normalize-space(ns2:prefLabel[@xml:lang=$mainLanguage2char])) = $countryName]))))
+      <sch:assert test="((not($countryName) and not($countryNameOtherLang)) or
+          (string($country-values//rdf:Description[lower-case(normalize-space(ns2:prefLabel[@xml:lang=$mainLanguage2char])) = $countryName])
           and
-          (not($countryNameOtherLang) or
-          string($country-values//rdf:Description[lower-case(normalize-space(ns2:prefLabel[@xml:lang=$altLanguage2char])) = $countryNameOtherLang]))"
-          >$loc/strings/ECCountry</sch:assert>
+          string($country-values//rdf:Description[lower-case(normalize-space(ns2:prefLabel[@xml:lang=$altLanguage2char])) = $countryNameOtherLang])))"
+      >$loc/strings/ECCountry</sch:assert>
 
     </sch:rule>
 
@@ -920,16 +1003,23 @@
 
     <!-- Distributor - Electronic Mail -->
     <sch:rule context="//gmd:distributionInfo/*/gmd:distributor/gmd:MD_Distributor/gmd:distributorContact/*/gmd:contactInfo/*/gmd:address/gmd:CI_Address/gmd:electronicMailAddress">
+      <sch:let name="emailAddress" value="string(gco:CharacterString)" />
+      <sch:let name="emailAddressOtherLang" value="string(gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString[@locale=concat('#', $altLanguageId)])" />
 
-      <sch:let name="missing" value="not(string(gco:CharacterString))
+      <sch:let name="missing" value="not($emailAddress)
                 or (@gco:nilReason)" />
 
-      <sch:let name="missingOtherLang" value="not(string(gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString[@locale=concat('#', $altLanguageId)]))" />
+      <sch:let name="missingOtherLang" value="not($emailAddressOtherLang)" />
+
+      <sch:let name="isEmailAddressFormat" value="XslUtilHnap:isEmailFormat($emailAddress, true())"/>
+   	  <sch:let name="isOtherLangEmailAddressFormat" value="XslUtilHnap:isEmailFormat($emailAddressOtherLang, true())"/>
 
       <sch:assert
         test="not($missing) and not($missingOtherLang)"
 
       >$loc/strings/DistributorElectronicMail</sch:assert>
+
+      <sch:assert test="string($isEmailAddressFormat) ='true' and string($isOtherLangEmailAddressFormat) ='true'">$loc/strings/ElectronicMailFormat</sch:assert>
 
     </sch:rule>
 

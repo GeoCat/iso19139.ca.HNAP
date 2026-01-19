@@ -31,9 +31,71 @@
   <sch:let name="mainLanguageText" value="if ($mainLanguage = 'fra') then 'French' else 'English'"/>
   <sch:let name="mainLanguage2char" value="if ($mainLanguage = 'fra') then 'fr' else 'en'"/>
 
+  <xsl:function xmlns:sch="http://purl.oclc.org/dsdl/schematron" name="geonet:protocolListString" as="xs:string">
+    <xsl:param name="protocolNode"/>
+
+  	<xsl:variable name="v">
+  	  <xsl:for-each select="$protocolNode">
+        <xsl:sort select="lower-case(.)" order="ascending"/>
+        <xsl:value-of select="."/>
+        <xsl:if test="position() != last()">, </xsl:if>
+       </xsl:for-each>
+    </xsl:variable>
+
+  	<xsl:value-of select="$v"/>
+  </xsl:function>
+
+  <xsl:function xmlns:sch="http://purl.oclc.org/dsdl/schematron" name="geonet:appendLocaleMessage">
+    <xsl:param name="localeStringNode"/>
+    <xsl:param name="appendText" as="xs:string"/>
+
+    <xsl:for-each select="$localeStringNode">
+      <xsl:copy>
+        <xsl:copy-of select="@*"/>
+        <xsl:value-of select="concat($localeStringNode, $appendText)"/>
+      </xsl:copy>
+    </xsl:for-each>
+  </xsl:function>
+
+
+  <xsl:function xmlns:sch="http://purl.oclc.org/dsdl/schematron"
+                  name="geonet:getDuplicateResources"
+                  as="xs:string">
+        <xsl:param name="elements" as="element()*"/>
+
+        <!-- Find groups of elements with duplicates -->
+        <xsl:variable name="duplicateResourcesElements">
+            <xsl:for-each-group select="$elements"
+                                group-by="concat(gmd:linkage/gmd:URL/text(), '|', tokenize(gmd:description/gco:CharacterString/text(), ';')[3])">
+                <xsl:if test="count(current-group()) &gt; 1">
+                    <xsl:sequence select="."/>
+                </xsl:if>
+            </xsl:for-each-group>
+        </xsl:variable>
+
+        <!-- Iterate over duplicate groups and generate the list of duplicates -->
+        <xsl:variable name="duplicateResources">
+            <xsl:for-each select="$duplicateResourcesElements/*">
+                    <xsl:if test="position() &gt; 1">
+                        <xsl:text>, </xsl:text>
+                    </xsl:if>
+                    <xsl:value-of select="concat(' ', tokenize(gmd:description/gco:CharacterString/text(), ';')[3], ';')"/>
+                    <xsl:value-of select="gmd:linkage/gmd:URL/text()"/>
+            </xsl:for-each>
+        </xsl:variable>
+
+        <!-- Return the results -->
+        <xsl:value-of select="$duplicateResources"/>
+  </xsl:function>
+
   <!--- Metadata pattern -->
   <sch:pattern>
     <sch:title>$loc/strings/Metadata</sch:title>
+
+    <sch:rule context="/gmd:MD_Metadata">
+      <sch:let name="missingContactMail" value="not(gmd:contact/*/gmd:contactInfo/*/gmd:address/gmd:CI_Address/gmd:electronicMailAddress)" />
+      <sch:assert test="not($missingContactMail)">$loc/strings/MissingContactMail</sch:assert>
+    </sch:rule>
 
     <!-- HierarchyLevel -->
     <sch:rule context="//gmd:hierarchyLevel">
@@ -118,6 +180,15 @@
     </sch:rule>
   </sch:pattern>
 
+  <!--Citation -->
+  <sch:pattern>
+      <sch:title>$loc/strings/requireCitation</sch:title>
+      <sch:rule context="//gmd:identificationInfo/*/gmd:citation">
+          <sch:assert test="gmd:CI_Citation">
+              <sch:value-of select="$loc/strings/alert.requiredCitation"/>
+          </sch:assert>
+      </sch:rule>
+  </sch:pattern>
 
   <!--- Data Identification pattern -->
   <sch:pattern>
@@ -185,29 +256,24 @@
 
 
     <!-- Creation/revision dates -->
-    <sch:rule context="//gmd:identificationInfo/*/gmd:citation/gmd:CI_Citation
-            |//*[@gco:isoType='gmd:MD_DataIdentification']/gmd:citation/gmd:CI_Citation
-            |//*[@gco:isoType='srv:SV_ServiceIdentification']/gmd:citation/gmd:CI_Citation">
+    <sch:rule context="//gmd:identificationInfo/*/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date[gmd:dateType/gmd:CI_DateTypeCode/@codeListValue = 'RI_367']/gmd:date
+    |//*[@gco:isoType='gmd:MD_DataIdentification']/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date[gmd:dateType/gmd:CI_DateTypeCode/@codeListValue = 'RI_367']/gmd:date
+    |//*[@gco:isoType='srv:SV_ServiceIdentification']/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date[gmd:dateType/gmd:CI_DateTypeCode/@codeListValue = 'RI_367']/gmd:date">
 
-      <sch:let name="missingPublication" value="count(gmd:date[gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode/@codeListValue = 'RI_367']) = 0" />
+      <sch:let name="creationDate" value="(../../../gmd:date/gmd:CI_Date[gmd:dateType/gmd:CI_DateTypeCode/@codeListValue = 'RI_366']/gmd:date/gco:Date
+                                         | ../../../gmd:date/gmd:CI_Date[gmd:dateType/gmd:CI_DateTypeCode/@codeListValue = 'RI_366']/gmd:date/gco:DateTime)[1]" />
+      <sch:let name="missingCreation" value="not(string($creationDate))" />
+      <sch:let name="publicationDate" value="gco:Date|gco:DateTime" />
+      <sch:let name="missingPublication" value="not(string($publicationDate))" />
 
-      <sch:assert
-        test="not($missingPublication)"
-      >$loc/strings/PublicationDate</sch:assert>
-
-      <sch:let name="missingCreation" value="count(gmd:date[gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode/@codeListValue = 'RI_366']) = 0" />
-
-      <sch:assert
-        test="not($missingCreation)"
-      >$loc/strings/CreationDate</sch:assert>
-
+      <sch:assert test="$missingPublication or $missingCreation or XslUtilHnap:compareDates($publicationDate, $creationDate) &gt;= 0 ">$loc/strings/PublicationDateBeforeCreationDate</sch:assert>
     </sch:rule>
 
-    <sch:rule context="//gmd:identificationInfo/*/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date
-            |//*[@gco:isoType='gmd:MD_DataIdentification']/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date
-            |//*[@gco:isoType='srv:SV_ServiceIdentification']/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date">
+    <sch:rule context="//gmd:identificationInfo/*/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date
+            |//*[@gco:isoType='gmd:MD_DataIdentification']/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date
+            |//*[@gco:isoType='srv:SV_ServiceIdentification']/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date">
 
-      <sch:let name="missing" value="not(string(gco:Date)) and not(string(gco:DateTime))
+      <sch:let name="missing" value="not(string(gmd:date/gco:Date)) and not(string(gmd:date/gco:DateTime))
                     " />
 
       <sch:assert
@@ -256,6 +322,47 @@
       <sch:let name="missingEndPosition" value="not(string($endPosition))" />
 
       <sch:assert test="$missingBeginPosition or $missingEndPosition or (XslUtilHnap:compareDates($endPosition, $beginPosition) &gt;= 0)">$loc/strings/EndPosition</sch:assert>
+    </sch:rule>
+
+    <!-- Geographical extent - mandatory if spatialRepresentationType exists -->
+    <sch:rule context="//gmd:identificationInfo/gmd:MD_DataIdentification[gmd:spatialRepresentationType]/gmd:extent/*/gmd:geographicElement/gmd:EX_GeographicBoundingBox
+                      |//gmd:identificationInfo/srv:SV_ServiceIdentification[gmd:spatialRepresentationType]/gmd:extent/*/gmd:geographicElement/gmd:EX_GeographicBoundingBox
+                      |//*[@gco:isoType='gmd:MD_DataIdentification' and gmd:spatialRepresentationType]/gmd:extent/*/gmd:geographicElement/gmd:EX_GeographicBoundingBox
+                      |//*[@gco:isoType='srv:SV_ServiceIdentification' and gmd:spatialRepresentationType]/gmd:extent/*/gmd:geographicElement/gmd:EX_GeographicBoundingBox">
+      <sch:let name="missing" value="(not(string(gmd:westBoundLongitude/gco:Decimal))
+                                  or not(string(gmd:eastBoundLongitude/gco:Decimal))
+                                  or not(string(gmd:southBoundLatitude/gco:Decimal))
+                                  or not(string(gmd:northBoundLatitude/gco:Decimal)))
+                                  or (@gco:nilReason)" />
+      <sch:assert
+        test="not($missing)"
+      >$loc/strings/GeographicExtentRequired</sch:assert>
+    </sch:rule>
+
+    <!-- Geographic extent - east-west check -->
+    <sch:rule context="//gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/*/gmd:geographicElement/gmd:EX_GeographicBoundingBox/gmd:westBoundLongitude
+                |//gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:extent/*/gmd:geographicElement/gmd:EX_GeographicBoundingBox/gmd:westBoundLongitude
+                |//*[@gco:isoType='gmd:MD_DataIdentification']/gmd:extent/*/gmd:geographicElement/gmd:EX_GeographicBoundingBox/gmd:westBoundLongitude
+                |//*[@gco:isoType='srv:SV_ServiceIdentification']/gmd:extent/*/gmd:geographicElement/gmd:EX_GeographicBoundingBox/gmd:westBoundLongitude">
+
+      <sch:let name="westBoundLongitude" value="gco:Decimal" />
+      <sch:let name="eastBoundLongitude" value="../gmd:eastBoundLongitude/gco:Decimal" />
+
+      <sch:assert
+        test="not(string($westBoundLongitude))  or not(string($eastBoundLongitude)) or (number($westBoundLongitude) &lt; number($eastBoundLongitude))">$loc/strings/GeographicExtentWestEast</sch:assert>
+    </sch:rule>
+
+    <!-- Geographic extent - north-south check -->
+    <sch:rule context="//gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/*/gmd:geographicElement/gmd:EX_GeographicBoundingBox/gmd:southBoundLatitude
+          |//gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:extent/*/gmd:geographicElement/gmd:EX_GeographicBoundingBox/gmd:southBoundLatitude
+          |//*[@gco:isoType='gmd:MD_DataIdentification']/gmd:extent/*/gmd:geographicElement/gmd:EX_GeographicBoundingBox/gmd:southBoundLatitude
+          |//*[@gco:isoType='srv:SV_ServiceIdentification']/gmd:extent/*/gmd:geographicElement/gmd:EX_GeographicBoundingBox/gmd:southBoundLatitude">
+
+      <sch:let name="southBoundLatitude" value="gco:Decimal" />
+      <sch:let name="northBoundLatitude" value="../gmd:northBoundLatitude/gco:Decimal" />
+
+      <sch:assert
+        test="not(string($northBoundLatitude))  or not(string($southBoundLatitude)) or (number($southBoundLatitude) &lt; number($northBoundLatitude))">$loc/strings/GeographicExtentNorthSouth</sch:assert>
     </sch:rule>
 
     <!-- Dataset language -->
@@ -335,6 +442,14 @@
               */gmd:thesaurusName/*/gmd:title/*/text() = 'Thésaurus des sujets de base du gouvernement du Canada']) > 0" />
 
       <sch:assert test="$coreSubjectThesaurusExists">$loc/strings/CoreSubjectThesaurusMissing</sch:assert>
+
+      <!-- Temporal extent - mandatory if spatialRepresentationType exists -->
+      <sch:let name="hasTemporalExtent" value="count(gmd:extent/*/gmd:temporalElement/*/gmd:extent/gml:TimePeriod) > 0" />
+      <sch:assert test="not(gmd:spatialRepresentationType) or  $hasTemporalExtent">$loc/strings/TemporalExtentRequired</sch:assert>
+
+      <!-- Geographic extent - mandatory if spatialRepresentationType exists -->
+      <sch:let name="hasGeographicExtent" value="count(gmd:extent/*/gmd:geographicElement/gmd:EX_GeographicBoundingBox) > 0" />
+      <sch:assert test="not(gmd:spatialRepresentationType) or $hasGeographicExtent">$loc/strings/GeographicExtentRequired</sch:assert>
     </sch:rule>
 
     <!-- Access constraints -->
@@ -380,6 +495,15 @@
         test="$isValid or $missing"
       >$loc/strings/InvalidUseConstraints</sch:assert>
     </sch:rule>
+
+    <sch:rule context="//gmd:identificationInfo">
+      <sch:let name="hierarchyLevel" value="string(parent::gmd:MD_Metadata/gmd:hierarchyLevel/gmd:MD_ScopeCode)"/>
+      <sch:let name="serviceLevel" value="string(parent::gmd:MD_Metadata/gmd:hierarchyLevel/gmd:MD_ScopeCode[@codeListValue='RI_631'])"/>
+      <sch:let name="serviceIndNode" value="string( //srv:SV_ServiceIdentification | //*[@gco:isoType='srv:SV_ServiceIdentification'] )"/>
+      <sch:let name="locMsg" value="geonet:appendLocaleMessage($loc/strings/ServiceNamespace, $hierarchyLevel)"/>
+
+      <sch:assert test="($serviceLevel and $serviceIndNode) or (not($serviceLevel) and not ($serviceIndNode) )">$locMsg</sch:assert>
+    </sch:rule>
   </sch:pattern>
 
 
@@ -403,6 +527,21 @@
 
     </sch:rule>
 
+    <sch:rule context="//gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource">
+        <sch:let name="locLabel" value="document(concat('../loc/', $lang, '/labels.xml'))"/>
+        <sch:let name="protocolList" value="$locLabel/labels/element[@name='gmd:protocol']/helper/option/@value"/>
+        <sch:let name="protocol" value="gmd:protocol/gco:CharacterString/text()"/>
+        <sch:let name="isValidProtocol" value="$protocol = $protocolList"/>
+
+    		<sch:let name="resourceName" value="gmd:name/gco:CharacterString/text()" />
+
+    		<sch:let name="protocolListString" value="geonet:protocolListString($protocolList)"/>
+
+        <sch:let name="locMsg" value="geonet:appendLocaleMessage($loc/strings/OnlineResourceProtocol, $protocolListString)"/>
+
+        <sch:assert test="$isValidProtocol">$locMsg</sch:assert>
+
+    </sch:rule>
 
     <!-- Online resource: MapResourcesREST, MapResourcesWMS-->
     <sch:rule context="//gmd:distributionInfo/gmd:MD_Distribution">
@@ -412,6 +551,8 @@
       <sch:let name="mapRESTCount" value="count(gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine[@xlink:role='urn:xml:lang:eng-CAN' and translate(gmd:CI_OnlineResource/gmd:protocol/gco:CharacterString, $uppercase, $smallcase) = 'esri rest: map service']) +
                 count(gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine[@xlink:role='urn:xml:lang:fra-CAN' and translate(gmd:CI_OnlineResource/gmd:protocol/gco:CharacterString, $uppercase, $smallcase) = 'esri rest: map service'])" />
 
+      <sch:let name="onlineResources" value="gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource" />
+
       <sch:assert test="$mapRESTCount &lt;= 2">$loc/strings/MapResourcesRESTNumber</sch:assert>
       <sch:assert test="$mapRESTCount = 0 or $mapRESTCount = 2 or $mapRESTCount &gt; 2">$loc/strings/MapResourcesREST</sch:assert>
 
@@ -420,6 +561,11 @@
 
       <sch:assert test="$mapWMSCount &lt;= 2">$loc/strings/MapResourcesWMSNumber</sch:assert>
       <sch:assert test="$mapWMSCount = 0 or $mapWMSCount = 2 or $mapWMSCount &gt; 2">$loc/strings/MapResourcesWMS</sch:assert>
+
+      <sch:let name="duplicatedResource" value="geonet:getDuplicateResources($onlineResources)" />
+      <sch:let name="locMsg" value="geonet:appendLocaleMessage($loc/strings/hasDuplicatedOnlineResource, $duplicatedResource)" />
+
+      <sch:assert test="not(string($duplicatedResource))">$locMsg</sch:assert>
     </sch:rule>
 
     <!-- Distribution - Format -->
@@ -436,7 +582,7 @@
 
       <sch:let name="distributionFormat" value="gco:CharacterString" />
 
-      <sch:assert test="($missing) or (string($distribution-formats//rdf:Description[normalize-space(ns2:prefLabel[@xml:lang=$mainLanguage2char]) = $distributionFormat]))">$loc/strings/DistributionFormatInvalid</sch:assert>
+      <sch:assert test="($missing) or (string($distribution-formats//rdf:Description[replace(@rdf:about, 'http://geonetwork-opensource.org/EC/resourceformat#', '') = $distributionFormat]))">$loc/strings/DistributionFormatInvalid</sch:assert>
 
     </sch:rule>
 

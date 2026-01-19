@@ -235,8 +235,8 @@
           {
             "type": "freeText",
             "heading": {
-              "eng": "Branch/Sector/Division",
-              "fra": "Branche/Secteur/Division"
+              "eng": "Sub-organizations (sectors, branches, etc.)",
+              "fra": "Sous-organisations (secteurs, branches, etc.)"
             }
           }
       ]
@@ -290,8 +290,8 @@
       <entries>
         <xsl:for-each select="$resourceFormatsTh/rdf:RDF/rdf:Description">
           <entry>
-            <code><xsl:value-of select="ns2:prefLabel[@xml:lang='en']" /></code>
-            <label> <xsl:value-of select="ns2:prefLabel[@xml:lang='en']" /></label>
+            <code><xsl:value-of select="replace(@rdf:about, 'http://geonetwork-opensource.org/EC/resourceformat#', '')" /></code>
+            <label><xsl:value-of select="ns2:prefLabel[@xml:lang=XslUtilHnap:twoCharLangCode($lang)]"/></label>
           </entry>
         </xsl:for-each>
       </entries>
